@@ -15,27 +15,27 @@ proc main(): void =
   glfwWindowHint(GLFWContextVersionMinor, 6)
   glfwWindowHint(GLFWOpenglForwardCompat, GLFW_TRUE)
   glfwWindowHint(GLFWOpenglProfile, GLFW_OPENGL_CORE_PROFILE)
-  glfwWindowHint(GLFWResizable, GLFW_TRUE)
+  glfwWindowHint(GLFWResizable, GLFW_FALSE)
   # glfwWindowHint(GLFWDecorated, GLFW_FALSE) # setWindowAttrib
   # glfwWindowHint(GLFWFloating, GLFW_TRUE) # setWindowAttrib
   # glfwWindowHint(GLFWMouseButtonPassthrough, GLFW_TRUE) # setWindowAttrib
 
-  let w: GLFWWindow = glfwCreateWindow(window_width, window_height, "critic Engine", nil, nil)
+  let window: GLFWWindow = glfwCreateWindow(window_width, window_height, "critic Engine", nil, nil)
   
-  w.setInputMode(GLFWCursorSpecial, GLFW_CURSOR_NORMAL)  
+  window.setInputMode(GLFWCursorSpecial, GLFW_CURSOR_NORMAL)  
+  window.makeContextCurrent()
 
-  w.makeContextCurrent
-
+  # additional info
   echo "Vulkan supported: " & $glfwVulkanSupported()
   
   # Opengl
   doAssert glInit()
   echo "OpenGL " & $glVersionMajor & "." & $glVersionMinor
-  # IG
-  let context = igCreateContext()
-  doAssert igGlfwInitForOpenGL(w, true)
-  doAssert igOpenGL3Init()
 
+  # additional ImGUI
+  let context = igCreateContext()
+  doAssert igGlfwInitForOpenGL(window, true)
+  doAssert igOpenGL3Init()
   igStyleColorsCherry()
 
   var
@@ -44,6 +44,7 @@ proc main(): void =
       vao,
       ebo: uint32
     ]
+    # shader:
     vertex: uint32
     fragment: uint32
     program: uint32
@@ -172,23 +173,23 @@ proc main(): void =
   glClearColor(33f/255, 33f/255, 33f/255, 1f)
   glEnable(GL_DEPTH_TEST)
     
-  while not w.windowShouldClose: 
-    if w.getKey(GLFWKey.Left) == GLFW_PRESS:
+  while not window.windowShouldClose: 
+    if window.getKey(GLFWKey.Left) == GLFW_PRESS:
       camera.position -= camera.right * 0.1
-    if w.getKey(GLFWKey.Right) == GLFW_PRESS:
+    if window.getKey(GLFWKey.Right) == GLFW_PRESS:
       camera.position += camera.right * 0.1
-    if w.getKey(GLFWKey.Up) == GLFW_PRESS:
+    if window.getKey(GLFWKey.Up) == GLFW_PRESS:
       camera.position += camera.front * 0.1f
-    if w.getKey(GLFWKey.Down) == GLFW_PRESS:
+    if window.getKey(GLFWKey.Down) == GLFW_PRESS:
       camera.position -= camera.front * 0.1f
 
-    if w.getKey(GLFWKey.W) == GLFW_PRESS:
+    if window.getKey(GLFWKey.W) == GLFW_PRESS:
       camera.pitch += 0.5f
-    if w.getKey(GLFWKey.S) == GLFW_PRESS:
+    if window.getKey(GLFWKey.S) == GLFW_PRESS:
       camera.pitch -= 0.5f
-    if w.getKey(GLFWKey.A) == GLFW_PRESS:
+    if window.getKey(GLFWKey.A) == GLFW_PRESS:
       camera.yaw -= 0.5f
-    if w.getKey(GLFWKey.D) == GLFW_PRESS:
+    if window.getKey(GLFWKey.D) == GLFW_PRESS:
       camera.yaw += 0.5f
     projectionMat = perspective(camera.zoom, window_width/window_height, 0.1f, 100.0f) 
     viewMat = camera.getViewMatrix() 
@@ -215,10 +216,10 @@ proc main(): void =
         
     glBindVertexArray(0)
 
-    w.swapBuffers
+    window.swapBuffers
     glfwPollEvents()
 
-  w.destroyWindow
+  window.destroyWindow
   glfwTerminate()
   glDeleteVertexArrays(1, mesh.vao.addr)
   glDeleteBuffers(1, mesh.vbo.addr)

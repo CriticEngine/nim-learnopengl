@@ -1,2 +1,1 @@
-#learnopengl-nim
-LearnOpenGL on nim-lang
+# Lesson 1.9 Camera

@@ -110,6 +110,7 @@ proc main(): void =
   glEnableVertexAttribArray(0);
   glBindVertexArray(0);
 
+  var camera = newCamera(position = vec3(0.0f,0f,3f))
 
   var lightingShader = newShader(getAppDir()/"programs/vertex.glsl", getAppDir()/"programs/fragment.glsl")
   
@@ -118,8 +119,9 @@ proc main(): void =
   var lightPos: Vec3[GLfloat] = vec3(1.2f, 1.0f, 2.0f)
   var lightPosLoc = glGetUniformLocation(lightingShader.id, "lightPos")
   glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z) 
+  var viewPosLoc = glGetUniformLocation(lightingShader.id, "viewPos");
+  glUniform3f(viewPosLoc, camera.position.x, camera.position.y, camera.position.z)
 
-  var camera = newCamera(position = vec3(0.0f,0f,3f))
   glClearColor(0f, 0f, 0f, 1f)
   glEnable(GL_DEPTH_TEST)
     
@@ -151,6 +153,9 @@ proc main(): void =
 
     # Кубик
     lightingShader.use() 
+
+    viewPosLoc = glGetUniformLocation(lightingShader.id, "viewPos");
+    glUniform3f(viewPosLoc, camera.position.x, camera.position.y, camera.position.z)
 
     lightPos = vec3(1.2f, 1.0f, 2.0f)
     lightPosLoc = glGetUniformLocation(lightingShader.id, "lightPos")

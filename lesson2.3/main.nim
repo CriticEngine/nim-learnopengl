@@ -150,16 +150,18 @@ proc main(): void =
     viewPosLoc = glGetUniformLocation(lightingShader.id, "viewPos");
     glUniform3f(viewPosLoc, camera.position.x, camera.position.y, camera.position.z)
 
-    lightPos = vec3(1.2f, 1.0f, 2.0f)
+    lightPos = vec3(sin(glfwGetTime()).GLFloat*3.0f, 2.0f, cos(glfwGetTime()).GLFloat*3.0f)
     lightPosLoc = glGetUniformLocation(lightingShader.id, "lightPos")
     glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z) 
 
-    let objectColorLoc = glGetUniformLocation(lightingShader.id, "objectColor")
-    let lightColorLoc = glGetUniformLocation(lightingShader.id, "lightColor")
-    
-    glUniform3f(objectColorLoc, 1.0f, 0.5f, 0.31f)
-    glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f)      
-     
+    lightingShader.setVec3("material.ambient",  vec3(0.0f, 0.0f, 0.0f))
+    lightingShader.setVec3("material.diffuse",  vec3(0.1f, 0.35f, 0.1f))
+    lightingShader.setVec3("material.specular",  vec3(0.45f, 0.55f, 0.45f))
+    lightingShader.setFloat("material.shininess",  0.25f)
+
+    lightingShader.setVec3("light.ambient",  vec3(1.0f, 1.0f, 1.0f))
+    lightingShader.setVec3("light.diffuse", vec3(1.0f, 1.0f, 1.0f))
+    lightingShader.setVec3("light.specular", vec3(1.0f, 1.0f, 1.0f))
 
     var modelLoc = glGetUniformLocation(lightingShader.id, "model")
     var viewLoc = glGetUniformLocation(lightingShader.id, "view")
@@ -169,7 +171,6 @@ proc main(): void =
     glUniformMatrix4fv(viewLoc, 1.GLsizei, false, addr view[0][0])
     glUniformMatrix4fv(projLoc, 1.GLsizei, false, addr projection[0][0])
 
-       
     glBindVertexArray(containerVAO)    
     model = mat4f(1)
     glUniformMatrix4fv(modelLoc, 1.GLsizei, false, addr model[0][0]);

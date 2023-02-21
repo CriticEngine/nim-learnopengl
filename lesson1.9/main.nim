@@ -1,4 +1,3 @@
-import nimgl/imgui, nimgl/imgui/[impl_opengl, impl_glfw]
 import nimgl/[opengl, glfw]
 import glm
 import os, math
@@ -31,12 +30,6 @@ proc main(): void =
   # Opengl
   doAssert glInit()
   echo "OpenGL " & $glVersionMajor & "." & $glVersionMinor
-
-  # additional ImGUI
-  let context = igCreateContext()
-  doAssert igGlfwInitForOpenGL(window, true)
-  doAssert igOpenGL3Init()
-  igStyleColorsCherry()
 
   var
     mesh: tuple[
@@ -178,15 +171,12 @@ proc main(): void =
       camera.position += camera.front * 0.1f
     if window.getKey(GLFWKey.Down) == GLFW_PRESS:
       camera.position -= camera.front * 0.1f
+    var posX: float64 
+    var posY: float64 
+    window.getCursorPos(addr posX, addr posY)
+    camera.pitch = - posY / 5
+    camera.yaw = -90f + posX / 5
 
-    if window.getKey(GLFWKey.W) == GLFW_PRESS:
-      camera.pitch += 0.5f
-    if window.getKey(GLFWKey.S) == GLFW_PRESS:
-      camera.pitch -= 0.5f
-    if window.getKey(GLFWKey.A) == GLFW_PRESS:
-      camera.yaw -= 0.5f
-    if window.getKey(GLFWKey.D) == GLFW_PRESS:
-      camera.yaw += 0.5f
     projectionMat = perspective(camera.zoom, window_width/window_height, 0.1f, 100.0f) 
     viewMat = camera.getViewMatrix() 
     
